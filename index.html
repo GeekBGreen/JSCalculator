@@ -1,0 +1,48 @@
+<!doctype html>
+
+<html>
+
+ <head>
+  <title>Calculator</title>
+  <link rel="stylesheet" href="CSS\style.css">
+  <script language="javascript" src="calculator.js"></script>
+ </head>
+
+ <body>
+  <h1>Calculator!</h1>
+
+  <form name="myForm">
+    <input type="button" name="1" value="1" OnClick="DisplayInput('1')">
+    <input type="button" name="2" value="2" OnClick="DisplayInput('2')">
+    <input type="button" name="3" value="3" OnClick="DisplayInput('3')">
+    <input type="button" name="4" value="4" OnClick="DisplayInput('4')">
+    <input type="button" name="5" value="5" OnClick="DisplayInput('5')">
+    <input type="button" name="6" value="6" OnClick="DisplayInput('6')">
+    <input type="button" name="7" value="7" OnClick="DisplayInput('7')">
+    <input type="button" name="8" value="8" OnClick="DisplayInput('8')">
+    <input type="button" name="9" value="9" OnClick="DisplayInput('9')">
+    <input type="button" name="0" value="0" OnClick="DisplayInput('0')">
+
+    <input type="button" name="add" value="+" OnClick="DisplayInput('+')">
+    <input type="button" name="sub" value="-" OnClick="DisplayInput('-')">
+    <input type="button" name="mul" value="*" OnClick="DisplayInput('*')">
+    <input type="button" name="div" value="/" OnClick="DisplayInput('/')">
+
+    <input type="button" name="=" value="=" OnClick="DisplayInput('=')">
+    <input type="button" name="clear" value="CLEAR" onClick="ClearEQ()">
+
+    Input<input type="text" name="user_input" id="user_input" value="Your input here">
+    Equation<input type="text" name="equation" id="equation" value="Your equation here" onClick="ChangeFocus("user_input")">
+<!--style this to be gray-->
+    Answer<input type="text" name="answer" value="Answer appears here">
+
+    <select id="base_selector" name="base_selector" value="Base Type" onchange="ChangeBaseMode()">
+      <option>Decimal</option>
+      <option>Binary</option>
+      <option>Hexadecimal</option>
+    </select>
+
+  </form>
+ </body>
+
+</html>
