@@ -7,7 +7,8 @@
 //   then continue to see what the current op is and store that in the appropriate location
 // > Look up how to write test cases, and practice writing them for this program.
 // > Look up more on CSS and design the layout for this application.
-
+// > Make it so you can add to the equation even after pressing "=". (e.g. it will clear the =
+//   and continue evaluating)
 
 
 var base_mode = "Decimal";

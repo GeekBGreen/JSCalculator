@@ -1,4 +1,30 @@
+body {
+	background-color: #85E6B6;
+}
+
 #base_selector
 {
 	display: none;
 }
+
+#zeroButton
+{
+	width: 6.5em;
+}
+
+#equalsButton
+{
+	width: 3.5em;
+}
+
+#clearButton
+{
+	width: 5em;
+}
+
+.numOrOpButton
+{
+	width: 2em;
+	height: 2em;
+}
+
