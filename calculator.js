@@ -1,15 +1,3 @@
-//TO DO
-// > See if the ValidateEQ() function is even needed anymore
-// > Add a flag that won't allow changing to the base mode once input has been entered
-// > Gray out the equation and answer text boxes. Change focus to input box when they're focused
-// > Make sure to add alerts when invalid characters are put into the input box
-// *>* There's a better way to implement the Evaluate() function: do to prev_op evaluation first,
-//   then continue to see what the current op is and store that in the appropriate location
-// > Look up how to write test cases, and practice writing them for this program.
-// > Look up more on CSS and design the layout for this application.
-// > Make it so you can add to the equation even after pressing "=". (e.g. it will clear the =
-//   and continue evaluating)
-
 
 var base_mode = "Decimal";
 var valid_eq = true;
