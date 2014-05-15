@@ -1,5 +1,19 @@
+h1 {
+	text-align: center;
+}
+
 body {
 	background-color: #85E6B6;
+}
+
+input[type="button"] {
+	margin-top: 3px;
+	margin-bottom: 3px;
+}
+
+input[type="text"] {
+	margin-top: 6px;
+	margin-bottom: 6px;
 }
 
 #base_selector
@@ -26,5 +40,11 @@ body {
 {
 	width: 2em;
 	height: 2em;
+}
+
+.label
+{
+	margin-top: 15px;
+	margin-bottom: 15px;
 }
 

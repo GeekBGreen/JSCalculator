@@ -12,7 +12,7 @@
 
  <body>
   <div class="container clearfix">
-	  <h1>Calculator!</h1>
+	  <h1>"Javascript Calculator"</h1>
 
 	  <form name="myForm">
 		<div class="grid_2">
@@ -20,62 +20,52 @@
 			<input type="button" name="2" value="2" OnClick="DisplayInput('2')" class="numOrOpButton">
 			<input type="button" name="3" value="3" OnClick="DisplayInput('3')" class="numOrOpButton">
 			<input type="button" name="add" value="+" OnClick="DisplayInput('+')" class="numOrOpButton">
-		</div>
-		
-		<div class="grid_1">
-			Input
-		</div>
-		<div class="grid_9 omega">
-			<input type="text" name="user_input" id="user_input" value="Your input here">
-		</div>
-		
-		<br><br><br>
-		
-		<div class="grid_2">
 			<input type="button" name="4" value="4" OnClick="DisplayInput('4')" class="numOrOpButton">
 			<input type="button" name="5" value="5" OnClick="DisplayInput('5')" class="numOrOpButton">
 			<input type="button" name="6" value="6" OnClick="DisplayInput('6')" class="numOrOpButton">
 			<input type="button" name="sub" value="-" OnClick="DisplayInput('-')" class="numOrOpButton">
-		</div>
-		
-		<div class="grid_1">
-			Equation
-		</div>
-		<div class="grid_9 omega">
-			<input type="text" name="equation" id="equation" value="Your equation here" onClick="ChangeFocus("user_input")">
-		</div>
-		
-		<br><br><br>
-		
-		<div class="grid_2">
 			<input type="button" name="7" value="7" OnClick="DisplayInput('7')" class="numOrOpButton">
 			<input type="button" name="8" value="8" OnClick="DisplayInput('8')" class="numOrOpButton">
 			<input type="button" name="9" value="9" OnClick="DisplayInput('9')" class="numOrOpButton">
 			<input type="button" name="mul" value="*" OnClick="DisplayInput('*')" class="numOrOpButton">
-		</div>
-		
-		<!--style the answer box to be grayed out-->
-		<div class="grid_1">
-			Answer 
-		</div>
-		<div class="grid_9 omega">
-			<input type="text" name="answer" value="Answer appears here">
-		</div>
-		
-		<br><br><br>
-		
-		<div class="grid_2 omega">
 			<input type="button" name="0" value="0" OnClick="DisplayInput('0')" class="numOrOpButton" id="zeroButton">
 			<input type="button" name="div" value="/" OnClick="DisplayInput('/')" class="numOrOpButton">
-		</div>
-		
-		<br><br><br>
-		
-		<div class="grid_2 omega">
 			<input type="button" name="=" value="=" OnClick="DisplayInput('=')" class="numOrOpButton" id="equalsButton">
 			<input type="button" name="clear" value="CLEAR" onClick="ClearEQ()" class="numOrOpButton" id="clearButton">
-		</div>	
+		</div>
+		
+		<div class="grid_1">
+			<p class="label">Input</p> 
+			<p class="label">Equation</p>
+			<p class="label">Answer</p> 
+		</div>
+		<div class="grid_3">
+			<input type="text" name="user_input" id="user_input" value="Your input here"> <br>
+			<input type="text" name="equation" id="equation" value="Your equation here" onClick="ChangeFocus("user_input")"> <br>
+			<!--style the answer box to be grayed out-->
+			<input type="text" name="answer" value="Answer appears here">
+		</div>
+		<div class="grid_6 omega">
+			<p>
+				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore 
+				et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut 
+				aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum 
+				dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui 
+				officia deserunt mollit anim id est laborum.
+			</p>
+		</div>
 	    
+		<br>
+		
+		<div class="grid_12 omega">
+			<p>
+				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore 
+				et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut 
+				aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum 
+				dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui 
+				officia deserunt mollit anim id est laborum.
+			</p>
+		</div>
 
 		<select id="base_selector" name="base_selector" value="Base Type" onchange="ChangeBaseMode()">
 		  <option>Decimal</option>

@@ -19,6 +19,7 @@ To do list before release:
   operations. If someone multiplies later, the equation will appear to be incorrect.
 
 
-Future Features:
+Future Features/Changes:
 - Hexadecimal math and conversions
 - Binary math and conversions
+- Use xml file for content instead of directly embedding it into html?
