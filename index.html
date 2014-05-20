@@ -3,7 +3,7 @@
 <html>
 
  <head>
-  <title>Calculator</title>
+  <title>JS Calculator</title>
   <link rel="stylesheet" href="css/normalize.css" type="text/css" media="screen">
   <link rel="stylesheet" href="css/grid.css" type="text/css" media="screen">
   <link rel="stylesheet" href="CSS\style.css">
@@ -12,8 +12,11 @@
 
  <body>
   <div class="container clearfix">
-	  <h1>"Javascript Calculator"</h1>
+	  <h1>JS Calculator</h1>
+	  <h4>A Simple Javascript Calculator</h4>
 
+	  <br>
+	  
 	  <form name="myForm">
 		<div class="grid_2">
 			<input type="button" name="1" value="1" OnClick="DisplayInput('1')" class="numOrOpButton">
@@ -40,33 +43,11 @@
 			<p class="label">Answer</p> 
 		</div>
 		<div class="grid_3">
-			<input type="text" name="user_input" id="user_input" value="Your input here"> <br>
-			<input type="text" name="equation" id="equation" value="Your equation here" onClick="ChangeFocus("user_input")"> <br>
-			<!--style the answer box to be grayed out-->
-			<input type="text" name="answer" value="Answer appears here">
+			<input type="text" name="user_input" id="user_input" disabled="disabled" value="Your input appears here"> <br>
+			<input type="text" name="equation" id="equation" disabled="disabled" value="Your equation here" onClick="ChangeFocus("user_input")"> <br>
+			<input type="text" name="answer" disabled="disabled" value="Answer appears here">
 		</div>
-		<div class="grid_6 omega">
-			<p>
-				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore 
-				et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut 
-				aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum 
-				dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui 
-				officia deserunt mollit anim id est laborum.
-			</p>
-		</div>
-	    
-		<br>
-		
-		<div class="grid_12 omega">
-			<p>
-				Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore 
-				et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut 
-				aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum 
-				dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui 
-				officia deserunt mollit anim id est laborum.
-			</p>
-		</div>
-
+	
 		<select id="base_selector" name="base_selector" value="Base Type" onchange="ChangeBaseMode()">
 		  <option>Decimal</option>
 		  <option>Binary</option>
@@ -74,6 +55,46 @@
 		</select>
 
 	  </form>
+	  
+	  <div class="grid_6 omega">
+			<h3>Description</h3>
+			<p>
+				This is a simple one page site containing a calculator application written in javascript. I'm new to 
+				web development, so I thought that creating a calculator application would be a decent first start
+				to becoming familiar with the entire process of creating a web app. I'll be using this site to experiment 
+				with web development and  design.
+			</p>
+			<p>
+				I hope this calculator is pretty self explanatory to use. At this point it only does basic operations on
+				decimal numbers. In the future I plan to add hexadecimal and binary operations/conversions to it as well.
+				In the end, it probably won't end up doing anything that the standard windows calculator can't do, but
+				at least it does something useful.
+			</p>
+	  </div>
+	  
+	  <div class="grid_6">
+			<h3>Future Features</h3>
+			<p>
+				<ul>
+					<li>Binary math and conversion</li>
+					<li>Hexadecimal math and conversion</li>
+					<li>A mobile version of the web page</li>
+					<li>Ability to type in the input box as if you were using a calculator</li>
+				</ul>
+			</p>
+	  </div>
+	  
+	  <div class="grid_6 omega">
+			<h3>Contact Me</h3>
+			<p>
+				If you would like to suggest other future features or design changes feel free to contact me
+				at info@JSCalculator.com.
+			</p>
+	  </div>
+	  
+	  <div id="copyright" class="grid_12">
+			<p>&copy; 2014 JSCalculator.com. All Rights Reserved</p>
+	  </div>
    </div>
  </body>
 

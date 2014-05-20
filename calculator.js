@@ -34,7 +34,7 @@ function DisplayInput(val) //Used to fill out the equation and input text field 
 	  }
 	  else //If it's not the first button press
 	  {
-		if(val.match(/[0-9]/) || val.match(/[a-f]/)) // If the new input value is a valid number [BCG] validate input
+		if(ValidateInput(val)) // If the new input value is a valid number then display it
 		{
 		  document.myForm.user_input.value = document.myForm.user_input.value + val;
 		}
@@ -81,25 +81,23 @@ function ChangeBaseMode()
 */
 function Evaluate()
 {
-  var user_input = document.myForm.user_input.value;
-  var equation = document.myForm.equation.value;
-  var input_and_op = null; //current input value and operator button pressed
-  var input = null;
-  var operator = ""; // current operator - [BCG] is this even needed?
-  var answer = null;
+	var user_input = document.myForm.user_input.value;
+	var equation = document.myForm.equation.value;
+	var input_and_op = null; //current input value and operator button pressed
+	var input = null;
+	var answer = null;
+
+	eval_call_count++;
+
+	//debug - print eval count to console
+	console.log("\n\neval_call_count = " + eval_call_count);
+	// end of debug
   
-  eval_call_count++;
-  //debug - print eval count to console
-  console.log("\n\neval_call_count = " + eval_call_count);
-  // end of debug
-  
-  // If the input is valid, evaluate in the appropriate base system
-  if(true)//[BCG] ValidateInput?
-  {
+	// If the input is valid, evaluate in the appropriate base system
 	switch(base_mode)
 	{
-	  case "Decimal":
-		  
+	case "Decimal":
+  
 		//if cases for the operator: +, -, *, /, and =
 		if (equation.match(/\d+\s\+\s$/)) //if operator is "+"
 		{
@@ -126,7 +124,7 @@ function Evaluate()
 				memory = answer;
 				prev_op_selected = input_and_op[0].match(/\+/); // parsing the operator from the string. Current op
 			
-	            //debug - print memory and prev_op_selected onto console
+				//debug - print memory and prev_op_selected onto console
 				console.log("memory = '" + memory + "'");
 				console.log("prev_op_selected = '" + prev_op_selected + "'");
 				//end of debug		
@@ -158,7 +156,7 @@ function Evaluate()
 				memory = answer;
 				prev_op_selected = input_and_op[0].match(/-/); // parsing the operator from the string. Current op
 			
-	            //debug - print memory and prev_op_selected onto console
+				//debug - print memory and prev_op_selected onto console
 				console.log("memory = '" + memory + "'");
 				console.log("prev_op_selected = '" + prev_op_selected + "'");
 				//end of debug		
@@ -189,7 +187,7 @@ function Evaluate()
 				memory = answer;
 				prev_op_selected = input_and_op[0].match(/\*/); // parsing the operator from the string. Current op
 			
-	            //debug - print memory and prev_op_selected onto console
+				//debug - print memory and prev_op_selected onto console
 				console.log("memory = '" + memory + "'");
 				console.log("prev_op_selected = '" + prev_op_selected + "'");
 				//end of debug		
@@ -220,7 +218,7 @@ function Evaluate()
 				memory = answer;
 				prev_op_selected = input_and_op[0].match(/\//); // parsing the operator from the string. Current op
 			
-	            //debug - print memory and prev_op_selected onto console
+				//debug - print memory and prev_op_selected onto console
 				console.log("memory = '" + memory + "'");
 				console.log("prev_op_selected = '" + prev_op_selected + "'");
 				//end of debug		
@@ -252,7 +250,7 @@ function Evaluate()
 				memory = 0;
 				prev_op_selected = input_and_op[0].match(/=/); // parsing the operator from the string. Current op
 			
-	            //debug - print memory and prev_op_selected onto console
+				//debug - print memory and prev_op_selected onto console
 				console.log("memory = '" + memory + "'");
 				console.log("prev_op_selected = '" + prev_op_selected + "'");
 				//end of debug		
@@ -263,41 +261,33 @@ function Evaluate()
 			answer = "INVALID OPERATOR";
 			end_of_equation = true;
 		}
-		
+
 		break;
 
 
-	  case "Binary":
+	case "Binary":
 
 		// Placeholder until binary is implemented
 		answer = document.myForm.equation.value
 
-		break;
+	break;
 
 
-	  case "Hexadecimal":
+	case "Hexadecimal":
 
 		// Placeholder until hex is implemented
 		answer = document.myForm.equation.value
 
-		break;
+	break;
 
 
-	  default:
+	default:
 		answer = "Invalid Base";
 	}
+	  
+	  document.myForm.answer.value = answer;
 
-  } 
-  else
-  {
-	answer = "Invalid Input";
-	window.alert("Invalid Input");
-	end_of_equation = true;
-  }
-  
-  document.myForm.answer.value = answer;
-
-  return answer;
+	  return answer;
 }
 
 function Eval_Previous_Operation(prev_op, current_value)
@@ -327,29 +317,28 @@ function Eval_Previous_Operation(prev_op, current_value)
 }
 
 function ValidateInput(user_input)
-{
-
-  // Placeholder until implemented
-  valid_eq=true;
+{ 
   
-  // Check if the equation is valid by checking if it ends in an operator
-
-  if (base_mode == "Decimal")
+  switch(base_mode)
   {
-    // Check if the equation is valid by checking for letters
-  }
-  else if(base_mode == "Binary")
-  {
-    // Check if the equation is valid by checking for any digit not 0 or 1
-  }
-  else if(base_mode == "Hexadecimal")
-  {
-    // Check if the equation is valid by checking for anything outside of 0-9 and A-F
-  }
-  else
-  {
-    valid_eq = false;
-  }
-
-  return valid_eq;
+		case "Decimal":
+			if(user_input.match(/[0-9]/)) // Checking to see if equation only contains decimal numbers
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+			break;
+		case "Binary":
+			// Check if the equation is valid by checking for any digit not 0 or 1
+			break;
+		case "Hexadecimal":
+			// Check if the equation is valid by checking for anything outside of 0-9 and A-F
+			break;
+		default:
+			return false;
+	}
+  
 }

@@ -23,3 +23,6 @@ Future Features/Changes:
 - Hexadecimal math and conversions
 - Binary math and conversions
 - Use xml file for content instead of directly embedding it into html?
+- You can type your input into the input box just like you would using the windows calculator. 
+  (i.e. typing a number, then hitting an operator, rinse, repeat and it calculates the answer as you go)
+- Mobile site

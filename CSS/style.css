@@ -2,6 +2,10 @@ h1 {
 	text-align: center;
 }
 
+h4 {
+	text-align: center;
+}
+
 body {
 	background-color: #85E6B6;
 }
@@ -14,6 +18,18 @@ input[type="button"] {
 input[type="text"] {
 	margin-top: 6px;
 	margin-bottom: 6px;
+}
+
+.numOrOpButton
+{
+	width: 2em;
+	height: 2em;
+}
+
+.label
+{
+	margin-top: 15px;
+	margin-bottom: 15px;
 }
 
 #base_selector
@@ -36,15 +52,11 @@ input[type="text"] {
 	width: 5em;
 }
 
-.numOrOpButton
-{
-	width: 2em;
-	height: 2em;
+#copyright {
+  border-top: 8px solid #000000;
+  margin: 15px 0px;
+  text-align: center;
 }
 
-.label
-{
-	margin-top: 15px;
-	margin-bottom: 15px;
-}
+
 
