@@ -1,4 +1,4 @@
-
+var currentState = CalcStateMachine.AwaitingInput; // Initializing state machine
 var base_mode = "Decimal";
 var valid_eq = true;
 var end_of_equation = false;
@@ -6,12 +6,53 @@ var memory = 0;
 var prev_op_selected = "";
 var eval_call_count = 0;  // Helps the evaluate function know when there are enough numbers to calculate
 
+// State machine enum object
+const CalcStateMachine = {
+    AwaitingInput: 0,
+    ValidateInput: 1,
+    AddInputToEQ: 2,
+    DisplayErrorMsg: 3,
+    DeleteEQ: 4,
+    EvaluteEQ: 5,
+    DisplayAnswer: 6
+}
+
+function UpdateStateMachine()
+{
+    switch (currentState)
+    {
+        case CalcStateMachine.AwaitingInput:
+            // Do something
+            break;
+        case CalcStateMachine.ValidateInput:
+            // Do something
+            break;
+        case CalcStateMachine.AddInputToEQ:
+            // Do something
+            break;
+        case CalcStateMachine.DisplayErrorMsg:
+            // Do something
+            // Fall into next state
+        case CalcStateMachine.DeleteEQ:
+            // Do something
+            break;
+        case CalcStateMachine.EvaluteEQ:
+            // Do something
+            // Fall into next state
+        case CalcStateMachine.DisplayAnswer:
+            // Do something
+            break;
+        default:
+            // Do something
+    }
+}
+
 function ClearEQ()
 {
     document.myForm.user_input.value = "";
     document.myForm.equation.value = "";
     document.myForm.answer.value = "";
-	
+
 	memory = null;
 	eval_call_count = 0;
 	end_of_equation = false;
@@ -44,14 +85,14 @@ function DisplayInput(val) //Used to fill out the equation and input text field 
 		  {
 			document.myForm.equation.value = document.myForm.equation.value + document.myForm.user_input.value + " " + val;
 			Evaluate();
-			
+
 			end_of_equation = true;
 		  }
 		  else
 		  {
 			document.myForm.equation.value = document.myForm.equation.value + document.myForm.user_input.value + " " + val + " ";
 			document.myForm.user_input.value = "";
-			
+
 			Evaluate();
 		  }
 		}
@@ -74,7 +115,7 @@ function ChangeBaseMode()
 }
 
 
-/* 
+/*
  Does not consider order of operations because it is only meant to be used to evaluate an equation
  with two values (one operator): i.e. 2+3 or 5*5. This is meant to be used to evaluate as each
  operator button is pushed to create a more complex equation (like the calc app in windows)
@@ -92,12 +133,12 @@ function Evaluate()
 	//debug - print eval count to console
 	console.log("\n\neval_call_count = " + eval_call_count);
 	// end of debug
-  
+
 	// If the input is valid, evaluate in the appropriate base system
 	switch(base_mode)
 	{
 	case "Decimal":
-  
+
 		//if cases for the operator: +, -, *, /, and =
 		if (equation.match(/\d+\s\+\s$/)) //if operator is "+"
 		{
@@ -106,12 +147,12 @@ function Evaluate()
 			//debug - print input_and_op match to console
 			console.log("input_and_op: '" + input_and_op + "'");
 			//end of debug
-			
+
 			if(eval_call_count == 1) //Store first value in memory and first operator in prev_op_selected
 			{
 				memory = input; // parsing the number from the string
 				prev_op_selected = input_and_op[0].match(/\+/); // parsing the operator from the string
-				
+
 				//debug - print memory and prev_op_selected onto console
 				console.log("memory = '" + memory + "'");
 				console.log("prev_op_selected = '" + prev_op_selected + "'");
@@ -120,14 +161,14 @@ function Evaluate()
 			else
 			{
 				answer = Eval_Previous_Operation(prev_op_selected[0], input);
-				
+
 				memory = answer;
 				prev_op_selected = input_and_op[0].match(/\+/); // parsing the operator from the string. Current op
-			
+
 				//debug - print memory and prev_op_selected onto console
 				console.log("memory = '" + memory + "'");
 				console.log("prev_op_selected = '" + prev_op_selected + "'");
-				//end of debug		
+				//end of debug
 			}
 
 		}
@@ -138,12 +179,12 @@ function Evaluate()
 			//debug - print input_and_op match to console
 			console.log("input_and_op: '" + input_and_op + "'");
 			//end of debug
-			
+
 			if(eval_call_count == 1) //Store first value in memory and first operator in prev_op_selected
 			{
 				memory = input; // parsing the number from the string
 				prev_op_selected = input_and_op[0].match(/-/); // parsing the operator from the string
-				
+
 				//debug - print memory and prev_op_selected onto console
 				console.log("memory = '" + memory + "'");
 				console.log("prev_op_selected = '" + prev_op_selected + "'");
@@ -152,14 +193,14 @@ function Evaluate()
 			else
 			{
 				answer = Eval_Previous_Operation(prev_op_selected[0], input);
-				
+
 				memory = answer;
 				prev_op_selected = input_and_op[0].match(/-/); // parsing the operator from the string. Current op
-			
+
 				//debug - print memory and prev_op_selected onto console
 				console.log("memory = '" + memory + "'");
 				console.log("prev_op_selected = '" + prev_op_selected + "'");
-				//end of debug		
+				//end of debug
 			}
 		}
 		else if (equation.match(/\d+\s\*\s$/)) //if operator is "*"
@@ -169,12 +210,12 @@ function Evaluate()
 			//debug - print input_and_op match to console
 			console.log("input_and_op: '" + input_and_op + "'");
 			//end of debug
-			
+
 			if(eval_call_count == 1) //Store first value in memory and first operator in prev_op_selected
 			{
 				memory = input; // parsing the number from the string
 				prev_op_selected = input_and_op[0].match(/\*/); // parsing the operator from the string
-				
+
 				//debug - print memory and prev_op_selected onto console
 				console.log("memory = '" + memory + "'");
 				console.log("prev_op_selected = '" + prev_op_selected + "'");
@@ -183,14 +224,14 @@ function Evaluate()
 			else
 			{
 				answer = Eval_Previous_Operation(prev_op_selected[0], input);
-				
+
 				memory = answer;
 				prev_op_selected = input_and_op[0].match(/\*/); // parsing the operator from the string. Current op
-			
+
 				//debug - print memory and prev_op_selected onto console
 				console.log("memory = '" + memory + "'");
 				console.log("prev_op_selected = '" + prev_op_selected + "'");
-				//end of debug		
+				//end of debug
 			}
 		}
 		else if (equation.match(/\d+\s\/\s$/)) //if operator is "/"
@@ -200,12 +241,12 @@ function Evaluate()
 			//debug - print input_and_op match to console
 			console.log("input_and_op: '" + input_and_op + "'");
 			//end of debug
-			
+
 			if(eval_call_count == 1) //Store first value in memory and first operator in prev_op_selected
 			{
 				memory = input; // parsing the number from the string
 				prev_op_selected = input_and_op[0].match(/\//); // parsing the operator from the string
-				
+
 				//debug - print memory and prev_op_selected onto console
 				console.log("memory = '" + memory + "'");
 				console.log("prev_op_selected = '" + prev_op_selected + "'");
@@ -214,14 +255,14 @@ function Evaluate()
 			else
 			{
 				answer = Eval_Previous_Operation(prev_op_selected[0], input);
-				
+
 				memory = answer;
 				prev_op_selected = input_and_op[0].match(/\//); // parsing the operator from the string. Current op
-			
+
 				//debug - print memory and prev_op_selected onto console
 				console.log("memory = '" + memory + "'");
 				console.log("prev_op_selected = '" + prev_op_selected + "'");
-				//end of debug		
+				//end of debug
 			}
 		}
 		else if (equation.match(/\d+\s\=$/)) //if operator is "="
@@ -231,12 +272,12 @@ function Evaluate()
 			//debug - print input_and_op match to console
 			console.log("input_and_op: '" + input_and_op + "'");
 			//end of debug
-			
-			if(eval_call_count == 1) 
+
+			if(eval_call_count == 1)
 			{
 				memory = 0; // parsing the number from the string
 				prev_op_selected = input_and_op[0].match(/=/); // parsing the operator from the string
-				
+
 				answer = input;
 				//debug - print memory and prev_op_selected onto console
 				console.log("memory = '" + memory + "'");
@@ -246,14 +287,14 @@ function Evaluate()
 			else
 			{
 				answer = Eval_Previous_Operation(prev_op_selected[0], input);
-				
+
 				memory = 0;
 				prev_op_selected = input_and_op[0].match(/=/); // parsing the operator from the string. Current op
-			
+
 				//debug - print memory and prev_op_selected onto console
 				console.log("memory = '" + memory + "'");
 				console.log("prev_op_selected = '" + prev_op_selected + "'");
-				//end of debug		
+				//end of debug
 			}
 		}
 		else
@@ -284,7 +325,7 @@ function Evaluate()
 	default:
 		answer = "Invalid Base";
 	}
-	  
+
 	  document.myForm.answer.value = answer;
 
 	  return answer;
@@ -293,7 +334,7 @@ function Evaluate()
 function Eval_Previous_Operation(prev_op, current_value)
 {
 	var result = null;
-	
+
 	//evaluate the current value with the previous operator
 	switch(prev_op)
 	{
@@ -312,13 +353,13 @@ function Eval_Previous_Operation(prev_op, current_value)
 		default:
 			result = "Previous Operator Invalid";
 	}
-	
+
 	return result;
 }
 
 function ValidateInput(user_input)
-{ 
-  
+{
+
   switch(base_mode)
   {
 		case "Decimal":
@@ -340,5 +381,5 @@ function ValidateInput(user_input)
 		default:
 			return false;
 	}
-  
+
 }
