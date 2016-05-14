@@ -17,13 +17,29 @@ const CalcStateMachine = {
     DisplayAnswer: 6
 }
 
-function UpdateStateMachine()
+function UpdateStateMachine(buttonPressed)
 {
     switch (currentState)
     {
         case CalcStateMachine.AwaitingInput:
-            // Do something
-            break;
+            // Was the button pressed a number or operator, the clear button, or the equals button?
+            if (ButtonPressedIsEquals)
+            {
+                currentState = CalcStateMachine.EvaluteEQ;
+                UpdateStateMachine(buttonPressed); // Going to try some recursion for the first time since college... we'll see how this goes.
+                break;
+            }
+            else if (ButtonPressedIsClear)
+            {
+                currentState = CalcStateMachine.DeleteEQ;
+                UpdateStateMachine(buttonPressed);
+                break;
+            }
+            else
+            {
+                currentState = CalcStateMachine.ValidateInput;
+                // Fall through to the next state
+            }
         case CalcStateMachine.ValidateInput:
             // Do something
             break;
@@ -44,6 +60,30 @@ function UpdateStateMachine()
             break;
         default:
             // Do something
+    }
+}
+
+function ButtonPressedIsEquals(buttonPressed)
+{
+    if (buttonPressed == '=')
+        {
+            return true;
+        }
+    else
+    {
+            return false;
+    }
+}
+
+function ButtonPressedIsClear(buttonPressed)
+{
+    if (buttonPressed == 'CLR')
+        {
+            return true;
+        }
+    else
+    {
+            return false;
     }
 }
 
