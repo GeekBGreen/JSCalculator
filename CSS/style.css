@@ -53,11 +53,18 @@ input[type="text"] {
 	width: 5em;
 }
 
+#openParenButton
+{
+	width: 4.3em;
+}
+
+#closeParenButton
+{
+	width: 4.3em;
+}
+
 #copyright {
   border-top: 8px solid #000000;
   margin: 15px 0px;
   text-align: center;
 }
-
-
-

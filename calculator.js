@@ -1,6 +1,7 @@
-var currentState = CalcStateMachine.AwaitingInput; // Initializing state machine
+var currentState = 0; //Initializing State machine to CalcStateMachine.AwaitingInput. Have to use int at this point because CalcStateMachine hasn't been declared yet.
+var equation = "";
 var base_mode = "Decimal";
-var valid_eq = true;
+var errorFlag = 0;
 var end_of_equation = false;
 var memory = 0;
 var prev_op_selected = "";
@@ -13,8 +14,16 @@ const CalcStateMachine = {
     AddInputToEQ: 2,
     DisplayErrorMsg: 3,
     DeleteEQ: 4,
-    EvaluteEQ: 5,
-    DisplayAnswer: 6
+    ValidateEQ: 5,
+    EvaluteEQ: 6,
+    DisplayAnswer: 7
+}
+
+// Error type flag enum object
+const ErrorType = {
+    NoErrors: 0,
+    InvalidInput: 1,
+    InvalidEquation: 2
 }
 
 function UpdateStateMachine(buttonPressed)
@@ -23,39 +32,62 @@ function UpdateStateMachine(buttonPressed)
     {
         case CalcStateMachine.AwaitingInput:
             // Was the button pressed a number or operator, the clear button, or the equals button?
-            if (ButtonPressedIsEquals)
+            LogStateToConsole("AwaitingInput", buttonPressed);
+
+            if (ButtonPressedIsEquals(buttonPressed))
             {
                 currentState = CalcStateMachine.EvaluteEQ;
-                UpdateStateMachine(buttonPressed); // Going to try some recursion for the first time since college... we'll see how this goes.
+                UpdateStateMachine(buttonPressed);
                 break;
             }
-            else if (ButtonPressedIsClear)
+            else if (ButtonPressedIsClear(buttonPressed))
             {
                 currentState = CalcStateMachine.DeleteEQ;
                 UpdateStateMachine(buttonPressed);
                 break;
             }
-            else
+            else // a number or operator button was pressed
             {
                 currentState = CalcStateMachine.ValidateInput;
                 // Fall through to the next state
             }
         case CalcStateMachine.ValidateInput:
-            // Do something
-            break;
+            LogStateToConsole("ValidateInput", buttonPressed);
+
+            if(!ValidInput(buttonPressed))
+            {
+                errorFlag = ErrorType.InvalidInput;
+                currentState = CalcStateMachine.DisplayErrorMsg;
+            }
+            else
+            {
+                // Input is valid
+                // Fall through to the next state
+            }
         case CalcStateMachine.AddInputToEQ:
+            LogStateToConsole("AddInputToEQ", buttonPressed);
             // Do something
+            currentState = CalcStateMachine.AwaitingInput;
             break;
         case CalcStateMachine.DisplayErrorMsg:
+            LogStateToConsole("DisplayErrorMsg", buttonPressed);
             // Do something
             // Fall into next state
         case CalcStateMachine.DeleteEQ:
+            LogStateToConsole("DeleteEQ", buttonPressed);
+            // Do something
+            // Also clear any error flags here
+            break;
+        case CalcStateMachine.ValidateEQ:
+            LogStateToConsole("ValidateEQ", buttonPressed);
             // Do something
             break;
         case CalcStateMachine.EvaluteEQ:
+            LogStateToConsole("EvaluteEQ", buttonPressed);
             // Do something
             // Fall into next state
         case CalcStateMachine.DisplayAnswer:
+            LogStateToConsole("DisplayAnswer", buttonPressed);
             // Do something
             break;
         default:
@@ -63,28 +95,44 @@ function UpdateStateMachine(buttonPressed)
     }
 }
 
-function ButtonPressedIsEquals(buttonPressed)
+function ButtonPressedIsEquals(passedButtonVal)
 {
-    if (buttonPressed == '=')
+    //debug
+    console.log("\nTeting for equals, value passed = '" + passedButtonVal + "'");
+    //endOfDebug
+    if (passedButtonVal == '=')
         {
+            console.log("ButtonPressedIsEquals: returning true");
             return true;
         }
     else
     {
+            console.log("ButtonPressedIsEquals: returning false");
             return false;
     }
 }
 
-function ButtonPressedIsClear(buttonPressed)
+function ButtonPressedIsClear(passedButtonVal)
 {
-    if (buttonPressed == 'CLR')
+    //debug
+    console.log("\nTeting for clear, value passed = '" + passedButtonVal + "'");
+    //endOfDebug
+    if (passedButtonVal == 'CLR')
         {
+            console.log("ButtonPressedIsClear: returning true");
             return true;
         }
     else
     {
-            return false;
+        console.log("ButtonPressedIsClear: returning false");
+        return false;
     }
+}
+
+function LogStateToConsole(state, buttonLog)
+{
+    console.log("\nEntering State: " + state);
+    console.log("Button Pressed = '" + buttonLog + "'");
 }
 
 function ClearEQ()
@@ -115,7 +163,7 @@ function DisplayInput(val) //Used to fill out the equation and input text field 
 	  }
 	  else //If it's not the first button press
 	  {
-		if(ValidateInput(val)) // If the new input value is a valid number then display it
+		if(ValidInput(val)) // If the new input value is a valid number then display it
 		{
 		  document.myForm.user_input.value = document.myForm.user_input.value + val;
 		}
@@ -397,18 +445,57 @@ function Eval_Previous_Operation(prev_op, current_value)
 	return result;
 }
 
-function ValidateInput(user_input)
+function ValidInput(currentInput)
+{
+    switch(base_mode)
+    {
+  		case "Decimal":
+  			if(currentInput.match(/^[0-9\(\)\+\-\*\/]$/))
+  			{
+                return true;
+            }
+  			else
+  			{
+                // Input contains invalid characters
+  				return false;
+  			}
+  			break;
+  		case "Binary":
+  			// Check if the equation is valid by checking for any digit not 0 or 1
+  			break;
+  		case "Hexadecimal":
+  			// Check if the equation is valid by checking for anything outside of 0-9 and A-F
+  			break;
+  		default:
+  			return false;
+  	}
+}
+
+function ValidEquation(currentEquation)
 {
 
   switch(base_mode)
   {
 		case "Decimal":
-			if(user_input.match(/[0-9]/)) // Checking to see if equation only contains decimal numbers
+			if(currentEquation.test(/^[0-9\(\)\+\-\*\/]+$/) != NULL) // Test to see if current equation only contains valid characters
 			{
-				return true;
+                // Test to see if there are an equal amount of opening and closing parentheses
+                var openParenthesesCount = currentEquation.match(/\(/g).length != NULL ?  currentEquation.match(/\(/g).length : 0;
+                var closeParenthesesCount = currentEquation.match(/\)/g).length != NULL ? currentEquation.match(/\)/g).length : 0;
+
+                if(openParenthesesCount == closeParenthesesCount)
+				{
+                    return true;
+                }
+                else
+                {
+                    // Equation is invalid because the parentheses counts don't match.
+                    return false;
+                }
 			}
 			else
 			{
+                // Equation contains invalid characters
 				return false;
 			}
 			break;
