@@ -1,7 +1,7 @@
 var currentState = 0; //Initializing State machine to CalcStateMachine.AwaitingInput. Have to use int at this point because CalcStateMachine hasn't been declared yet.
 var equation = "";
 var base_mode = "Decimal";
-var errorFlag = 0;
+var errorFlag = 0; //NoErrors
 var end_of_equation = false;
 var memory = 0;
 var prev_op_selected = "";
@@ -58,6 +58,8 @@ function UpdateStateMachine(buttonPressed)
             {
                 errorFlag = ErrorType.InvalidInput;
                 currentState = CalcStateMachine.DisplayErrorMsg;
+                UpdateStateMachine(buttonPressed);
+                break;
             }
             else
             {
@@ -66,12 +68,33 @@ function UpdateStateMachine(buttonPressed)
             }
         case CalcStateMachine.AddInputToEQ:
             LogStateToConsole("AddInputToEQ", buttonPressed);
-            // Do something
+
+            equation += buttonPressed;
+
+            //debug
+            console.log("Equation now: '" + equation + "'");
+            //endOfDebug
+
             currentState = CalcStateMachine.AwaitingInput;
             break;
         case CalcStateMachine.DisplayErrorMsg:
             LogStateToConsole("DisplayErrorMsg", buttonPressed);
-            // Do something
+
+            switch (errorFlag) {
+                case 0:
+                    console.log("Possible bug, showing an error state of No Errors but displaying error message.");
+                    break;
+                case 1:
+                    console.log("Error thrown - Invalid Input");
+                    window.alert("ERROR: Invalid input. Please start equation again.");
+                    break;
+                case 2:
+                    console.log("Error thrown - Invalid Equation");
+                    window.alert("ERROR: Invalid equation. Please check parentheses and start again.");
+                    break;
+                default:
+                    console.log("Possible bug, got to default case of error handling.");
+            }
             // Fall into next state
         case CalcStateMachine.DeleteEQ:
             LogStateToConsole("DeleteEQ", buttonPressed);
