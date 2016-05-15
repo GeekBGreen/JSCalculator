@@ -51,6 +51,7 @@ function UpdateStateMachine(buttonPressed)
                 currentState = CalcStateMachine.ValidateInput;
                 // Fall through to the next state
             }
+
         case CalcStateMachine.ValidateInput:
             LogStateToConsole("ValidateInput", buttonPressed);
 
@@ -66,10 +67,12 @@ function UpdateStateMachine(buttonPressed)
                 // Input is valid
                 // Fall through to the next state
             }
+
         case CalcStateMachine.AddInputToEQ:
             LogStateToConsole("AddInputToEQ", buttonPressed);
 
             equation += buttonPressed;
+            document.myForm.user_input.value += buttonPressed;
 
             //debug
             console.log("Equation now: '" + equation + "'");
@@ -77,6 +80,7 @@ function UpdateStateMachine(buttonPressed)
 
             currentState = CalcStateMachine.AwaitingInput;
             break;
+
         case CalcStateMachine.DisplayErrorMsg:
             LogStateToConsole("DisplayErrorMsg", buttonPressed);
 
@@ -96,23 +100,46 @@ function UpdateStateMachine(buttonPressed)
                     console.log("Possible bug, got to default case of error handling.");
             }
             // Fall into next state
+
         case CalcStateMachine.DeleteEQ:
             LogStateToConsole("DeleteEQ", buttonPressed);
-            // Do something
-            // Also clear any error flags here
+
+            equation = "";
+            document.myForm.equation.value = "Your equation here";
+
+            errorFlag = 0; // Also clear any error flags
+
+            currentState = CalcStateMachine.AwaitingInput;
+
             break;
+
         case CalcStateMachine.ValidateEQ:
             LogStateToConsole("ValidateEQ", buttonPressed);
-            // Do something
-            break;
+
+            if(!ValidEquation(equation))
+            {
+                errorFlag = ErrorType.InvalidEquation;
+                currentState = CalcStateMachine.DisplayErrorMsg;
+                UpdateStateMachine(buttonPressed);
+                break;
+            }
+            else
+            {
+                // Input is valid
+                // Fall through to the next state
+            }
+
         case CalcStateMachine.EvaluteEQ:
             LogStateToConsole("EvaluteEQ", buttonPressed);
+
             // Do something
+            
             // Fall into next state
         case CalcStateMachine.DisplayAnswer:
             LogStateToConsole("DisplayAnswer", buttonPressed);
             // Do something
             break;
+
         default:
             // Do something
     }
