@@ -23,11 +23,15 @@ const CalcStateMachine = {
 const ErrorType = {
     NoErrors: 0,
     InvalidInput: 1,
-    InvalidEquation: 2
+    InvalidEQParenMismatch: 2,
+    InvalidEQOpAfterOpenParen: 3,
+    InvalidEQContainsInvalidChar: 4
 }
 
 function UpdateStateMachine(buttonPressed)
 {
+    var solutionToEq = null;
+
     switch (currentState)
     {
         case CalcStateMachine.AwaitingInput:
@@ -36,7 +40,7 @@ function UpdateStateMachine(buttonPressed)
 
             if (ButtonPressedIsEquals(buttonPressed))
             {
-                currentState = CalcStateMachine.EvaluteEQ;
+                currentState = CalcStateMachine.ValidateEQ;
                 UpdateStateMachine(buttonPressed);
                 break;
             }
@@ -72,7 +76,13 @@ function UpdateStateMachine(buttonPressed)
             LogStateToConsole("AddInputToEQ", buttonPressed);
 
             equation += buttonPressed;
-            document.myForm.user_input.value += buttonPressed;
+
+            // Displaying the equation beign built in the appropriate text box
+            if (document.myForm.equation.value == "Your equation here")
+            {
+                document.myForm.equation.value = '';
+            }
+            document.myForm.equation.value += buttonPressed;
 
             //debug
             console.log("Equation now: '" + equation + "'");
@@ -93,8 +103,16 @@ function UpdateStateMachine(buttonPressed)
                     window.alert("ERROR: Invalid input. Please start equation again.");
                     break;
                 case 2:
-                    console.log("Error thrown - Invalid Equation");
-                    window.alert("ERROR: Invalid equation. Please check parentheses and start again.");
+                    console.log("Error thrown - Invalid Equation: parentheses mismatch");
+                    window.alert("ERROR: Invalid equation. Parentheses mismatch. Please check parentheses and start again.");
+                    break;
+                case 3:
+                    console.log("Error thrown - Invalid Equation: operator found following open parenthesis");
+                    window.alert("ERROR: Invalid equation. Operator found following open parenthesis. Please check equation and start again.");
+                    break;
+                case 4:
+                    console.log("Error thrown - Invalid Equation: equation contains invalid characters");
+                    window.alert("ERROR: Invalid equation. Contains invalid characters. Please check equation and start again.");
                     break;
                 default:
                     console.log("Possible bug, got to default case of error handling.");
@@ -105,9 +123,11 @@ function UpdateStateMachine(buttonPressed)
             LogStateToConsole("DeleteEQ", buttonPressed);
 
             equation = "";
-            document.myForm.equation.value = "Your equation here";
-
+            solutionToEq = null;
             errorFlag = 0; // Also clear any error flags
+
+            document.myForm.equation.value = "Your equation here";
+            document.myForm.answer.value = "Answer appears here";
 
             currentState = CalcStateMachine.AwaitingInput;
 
@@ -118,7 +138,6 @@ function UpdateStateMachine(buttonPressed)
 
             if(!ValidEquation(equation))
             {
-                errorFlag = ErrorType.InvalidEquation;
                 currentState = CalcStateMachine.DisplayErrorMsg;
                 UpdateStateMachine(buttonPressed);
                 break;
@@ -132,16 +151,21 @@ function UpdateStateMachine(buttonPressed)
         case CalcStateMachine.EvaluteEQ:
             LogStateToConsole("EvaluteEQ", buttonPressed);
 
-            // Do something
-            
+            solutionToEq = Evaluate();
+
+            currentState = CalcStateMachine.DisplayAnswer;
+
             // Fall into next state
         case CalcStateMachine.DisplayAnswer:
             LogStateToConsole("DisplayAnswer", buttonPressed);
-            // Do something
+
+            document.myForm.answer.value = solutionToEq;
+
+            currentState = CalcStateMachine.AwaitingInput;
             break;
 
         default:
-            // Do something
+            console.log("Potential bug. Somewhere got to default state in state machine.");
     }
 }
 
@@ -252,196 +276,180 @@ function ChangeBaseMode()
   return base_mode;
 }
 
-
-/*
- Does not consider order of operations because it is only meant to be used to evaluate an equation
- with two values (one operator): i.e. 2+3 or 5*5. This is meant to be used to evaluate as each
- operator button is pushed to create a more complex equation (like the calc app in windows)
-*/
 function Evaluate()
 {
-	var user_input = document.myForm.user_input.value;
-	var equation = document.myForm.equation.value;
-	var input_and_op = null; //current input value and operator button pressed
-	var input = null;
 	var answer = null;
-
-	eval_call_count++;
-
-	//debug - print eval count to console
-	console.log("\n\neval_call_count = " + eval_call_count);
-	// end of debug
+    var subEquation = '';
+    var subEQAnswer = null;
+    var sideA = null;
+    var sideB = null;
+    var origSubEQ = '';
 
 	// If the input is valid, evaluate in the appropriate base system
 	switch(base_mode)
 	{
-	case "Decimal":
+        case "Decimal":
 
-		//if cases for the operator: +, -, *, /, and =
-		if (equation.match(/\d+\s\+\s$/)) //if operator is "+"
-		{
-			input_and_op = equation.match(/\d+\s\+\s$/);
-			input = parseInt(input_and_op[0].match(/^\d+/));
-			//debug - print input_and_op match to console
-			console.log("input_and_op: '" + input_and_op + "'");
-			//end of debug
+            // Does equation contain parentheses? If so evaluate all of those first
+            while (equation.match(/[\(\)]/))
+            {
+                var parenSetMatches = equation.match(/\([\d\+\-\*\/]+\)/g);  // will only match single parentheses sets (not multi tiered)
 
-			if(eval_call_count == 1) //Store first value in memory and first operator in prev_op_selected
-			{
-				memory = input; // parsing the number from the string
-				prev_op_selected = input_and_op[0].match(/\+/); // parsing the operator from the string
+                //debug
+                console.log("\nEntering Decimal Evaluate with parentheses. parenSetMatches = " + parenSetMatches);
+                //endOfDebug
 
-				//debug - print memory and prev_op_selected onto console
-				console.log("memory = '" + memory + "'");
-				console.log("prev_op_selected = '" + prev_op_selected + "'");
-				//end of debug
-			}
-			else
-			{
-				answer = Eval_Previous_Operation(prev_op_selected[0], input);
+                for (var i = 0; i < parenSetMatches.length; i++)
+                {
+                    //debug
+                    console.log("\nCurrent parentheses set: " + parenSetMatches[i]);
+                    //endOfDebug
 
-				memory = answer;
-				prev_op_selected = input_and_op[0].match(/\+/); // parsing the operator from the string. Current op
+                    origSubEQ = parenSetMatches[i]; // Store the original parentheses set to delete from equation later
 
-				//debug - print memory and prev_op_selected onto console
-				console.log("memory = '" + memory + "'");
-				console.log("prev_op_selected = '" + prev_op_selected + "'");
-				//end of debug
-			}
+                    // match for any * and surrounding numbers, evaluate, and replace in sub equation
+                    while(parenSetMatches[i].match(/\d+\*\d+/)) //BCG replace conditional with function call to something like HasOperator(subEQ, op) that returns a bool.
+                    {
+                        //debug
+                        console.log("Multiplication found");
+                        //endOfDebug
+                        //BCG - Replace following 4 lines with a function call to something like EvaluateSubEQ(subEQ, op) that returns the subEQAnswer?
+                        subEquation = String(parenSetMatches[i].match(/\d+\*\d+/));
+                        //debug
+                        console.log("SubEquation = " + subEquation);
+                        //endOfDebug
+                        // parse subEquation for sideA, and sideB
+                        sideA = parseInt(subEquation.match(/^\d+/));
+                        sideB = parseInt(subEquation.match(/\d+$/));
+                        //debug
+                        console.log("sideA parsed = " + sideA);
+                        console.log("sideB parsed = " + sideB);
+                        //endOfDebug
+                        subEQAnswer = sideA * sideB;
+                        //debug
+                        console.log("subEQAnswer =  " + subEQAnswer);
+                        //endOfDebug
 
-		}
-		else if (equation.match(/\d+\s-\s$/)) //if operator is "-"
-		{
-			input_and_op = equation.match(/\d+\s-\s$/);
-			input = parseInt(input_and_op[0].match(/^\d+/));
-			//debug - print input_and_op match to console
-			console.log("input_and_op: '" + input_and_op + "'");
-			//end of debug
+                        // Replace subEquation with with subEQAnswer in string and get rid of parentheses
+                        parenSetMatches[i] = parenSetMatches[i].replace(subEquation, String(subEQAnswer));
+                        parenSetMatches[i] = parenSetMatches[i].replace(/\(/, '');
+                        parenSetMatches[i] = parenSetMatches[i].replace(/\)/, '');
+                        //debug
+                        console.log("modified parenSetMatch =  " + parenSetMatches[i]);
+                        //endOfDebug
+                    }
+                    // match for any / and surrounding numbers, evaluate, and replace in sub equation
+                    while(parenSetMatches[i].match(/\d+\/\d+/))
+                    {
+                        subEquation = String(parenSetMatches[i].match(/\d+\/\d+/));
+                        // parse subEquation for sideA, and sideB
+                        sideA = parseInt(subEquation.match(/^\d+/));
+                        sideB = parseInt(subEquation.match(/\d+$/));
+                        subEQAnswer = sideA / sideB;
 
-			if(eval_call_count == 1) //Store first value in memory and first operator in prev_op_selected
-			{
-				memory = input; // parsing the number from the string
-				prev_op_selected = input_and_op[0].match(/-/); // parsing the operator from the string
+                        // Replace subEquation with with subEQAnswer in string
+                        parenSetMatches[i] = parenSetMatches[i].replace(subEquation, String(subEQAnswer));
+                    }
+                    // match for any + and surrounding numbers, evaluate, and replace in sub equation
+                    while(parenSetMatches[i].match(/\d+\+\d+/))
+                    {
+                        subEquation = String(parenSetMatches[i].match(/\d+\+\d+/));
+                        // parse subEquation for sideA, and sideB
+                        sideA = parseInt(subEquation.match(/^\d+/));
+                        sideB = parseInt(subEquation.match(/\d+$/));
+                        subEQAnswer = sideA + sideB;
 
-				//debug - print memory and prev_op_selected onto console
-				console.log("memory = '" + memory + "'");
-				console.log("prev_op_selected = '" + prev_op_selected + "'");
-				//end of debug
-			}
-			else
-			{
-				answer = Eval_Previous_Operation(prev_op_selected[0], input);
+                        // Replace subEquation with with subEQAnswer in string
+                        parenSetMatches[i] = parenSetMatches[i].replace(subEquation, String(subEQAnswer));
+                    }
+                    // match for any - and surrounding numbers, evaluate, and replace in sub equation
+                    while(parenSetMatches[i].match(/\d+\-\d+/))
+                    {
+                        subEquation = String(parenSetMatches[i].match(/\d+\-\d+/));
+                        // parse subEquation for sideA, and sideB
+                        sideA = parseInt(subEquation.match(/^\d+/));
+                        sideB = parseInt(subEquation.match(/\d+$/));
+                        subEQAnswer = sideA - sideB;
 
-				memory = answer;
-				prev_op_selected = input_and_op[0].match(/-/); // parsing the operator from the string. Current op
+                        // Replace subEquation with with subEQAnswer in string
+                        parenSetMatches[i] = parenSetMatches[i].replace(subEquation, String(subEQAnswer));
+                    }
 
-				//debug - print memory and prev_op_selected onto console
-				console.log("memory = '" + memory + "'");
-				console.log("prev_op_selected = '" + prev_op_selected + "'");
-				//end of debug
-			}
-		}
-		else if (equation.match(/\d+\s\*\s$/)) //if operator is "*"
-		{
-			input_and_op = equation.match(/\d+\s\*\s$/);
-			input = parseInt(input_and_op[0].match(/^\d+/));
-			//debug - print input_and_op match to console
-			console.log("input_and_op: '" + input_and_op + "'");
-			//end of debug
+                    // Remove the parentheses from the solution
+                    parenSetMatches[i] = parenSetMatches[i].replace(/\(/, '');
+                    parenSetMatches[i] = parenSetMatches[i].replace(/\)/, '');
 
-			if(eval_call_count == 1) //Store first value in memory and first operator in prev_op_selected
-			{
-				memory = input; // parsing the number from the string
-				prev_op_selected = input_and_op[0].match(/\*/); // parsing the operator from the string
+                    // Replace the parentheses set with the solution in the original equation
+                    equation = equation.replace(origSubEQ, String(parenSetMatches[i]));
+                    //debug
+                    console.log("modified equation =  " + equation);
+                    //endOfDebug
 
-				//debug - print memory and prev_op_selected onto console
-				console.log("memory = '" + memory + "'");
-				console.log("prev_op_selected = '" + prev_op_selected + "'");
-				//end of debug
-			}
-			else
-			{
-				answer = Eval_Previous_Operation(prev_op_selected[0], input);
+                }
+            }
 
-				memory = answer;
-				prev_op_selected = input_and_op[0].match(/\*/); // parsing the operator from the string. Current op
+            // Now evaluate the equation without parentheses
+            answer = equation;
+            // match for any * and surrounding numbers, evaluate, and replace in sub equation
+            while(answer.match(/\d+\*\d+/)) //BCG replace conditional with function call to something like HasOperator(subEQ, op) that returns a bool.
+            {
+                //BCG - Replace following 4 lines with a function call to something like EvaluateSubEQ(subEQ, op) that returns the subEQAnswer?
+                subEquation = answer.match(/\d+\*\d+/);
+                // parse subEquation for sideA, and sideB
+                sideA = parseInt(answer.match(/^\d+/));
+                sideB = parseInt(answer.match(/\d+$/));
+                subEQAnswer = sideA * sideB;
 
-				//debug - print memory and prev_op_selected onto console
-				console.log("memory = '" + memory + "'");
-				console.log("prev_op_selected = '" + prev_op_selected + "'");
-				//end of debug
-			}
-		}
-		else if (equation.match(/\d+\s\/\s$/)) //if operator is "/"
-		{
-			input_and_op = equation.match(/\d+\s\/\s$/);
-			input = parseInt(input_and_op[0].match(/^\d+/));
-			//debug - print input_and_op match to console
-			console.log("input_and_op: '" + input_and_op + "'");
-			//end of debug
+                // Replace subEquation with with subEQAnswer in string
+                answer = answer.replace(subEquation, String(subEQAnswer));
+            }
+            // match for any / and surrounding numbers, evaluate, and replace in sub equation
+            while(answer.match(/\d+\/\d+/))
+            {
+                subEquation = answer.match(/\d+\/\d+/);
+                // parse subEquation for sideA, and sideB
+                sideA = parseInt(answer.match(/^\d+/));
+                sideB = parseInt(answer.match(/\d+$/));
+                subEQAnswer = sideA / sideB;
 
-			if(eval_call_count == 1) //Store first value in memory and first operator in prev_op_selected
-			{
-				memory = input; // parsing the number from the string
-				prev_op_selected = input_and_op[0].match(/\//); // parsing the operator from the string
+                // Replace subEquation with with subEQAnswer in string
+                answer = answer.replace(subEquation, String(subEQAnswer));
+            }
+            // match for any + and surrounding numbers, evaluate, and replace in sub equation
+            while(answer.match(/\d+\+\d+/))
+            {
+                subEquation = answer.match(/\d+\+\d+/);
+                // parse subEquation for sideA, and sideB
+                sideA = parseInt(answer.match(/^\d+/));
+                sideB = parseInt(answer.match(/\d+$/));
+                subEQAnswer = sideA + sideB;
 
-				//debug - print memory and prev_op_selected onto console
-				console.log("memory = '" + memory + "'");
-				console.log("prev_op_selected = '" + prev_op_selected + "'");
-				//end of debug
-			}
-			else
-			{
-				answer = Eval_Previous_Operation(prev_op_selected[0], input);
+                // Replace subEquation with with subEQAnswer in string
+                answer = answer.replace(subEquation, String(subEQAnswer));
+            }
+            // match for any - and surrounding numbers, evaluate, and replace in sub equation
+            while(answer.match(/\d+\-\d+/))
+            {
+                subEquation = answer.match(/\d+\-\d+/);
+                // parse subEquation for sideA, and sideB
+                sideA = parseInt(answer.match(/^\d+/));
+                sideB = parseInt(answer.match(/\d+$/));
+                subEQAnswer = sideA - sideB;
 
-				memory = answer;
-				prev_op_selected = input_and_op[0].match(/\//); // parsing the operator from the string. Current op
+                // Replace subEquation with with subEQAnswer in string
+                answer = answer.replace(subEquation, String(subEQAnswer));
+            }
 
-				//debug - print memory and prev_op_selected onto console
-				console.log("memory = '" + memory + "'");
-				console.log("prev_op_selected = '" + prev_op_selected + "'");
-				//end of debug
-			}
-		}
-		else if (equation.match(/\d+\s\=$/)) //if operator is "="
-		{
-			input_and_op = equation.match(/\d+\s=$/);
-			input = parseInt(input_and_op[0].match(/^\d+/));
-			//debug - print input_and_op match to console
-			console.log("input_and_op: '" + input_and_op + "'");
-			//end of debug
+            // Remove the parentheses from the solution
+            answer.replace(/\(/, '');
+            answer.replace(/\)/, '');
 
-			if(eval_call_count == 1)
-			{
-				memory = 0; // parsing the number from the string
-				prev_op_selected = input_and_op[0].match(/=/); // parsing the operator from the string
+            //answer should now
+            console.log("Solution to equation = " + answer);
 
-				answer = input;
-				//debug - print memory and prev_op_selected onto console
-				console.log("memory = '" + memory + "'");
-				console.log("prev_op_selected = '" + prev_op_selected + "'");
-				//end of debug
-			}
-			else
-			{
-				answer = Eval_Previous_Operation(prev_op_selected[0], input);
-
-				memory = 0;
-				prev_op_selected = input_and_op[0].match(/=/); // parsing the operator from the string. Current op
-
-				//debug - print memory and prev_op_selected onto console
-				console.log("memory = '" + memory + "'");
-				console.log("prev_op_selected = '" + prev_op_selected + "'");
-				//end of debug
-			}
-		}
-		else
-		{
-			answer = "INVALID OPERATOR";
-			end_of_equation = true;
-		}
-
-		break;
+            return answer;
+		    break;
+            // End of refactor code for evaluate Old code begins now
 
 
 	case "Binary":
@@ -464,35 +472,17 @@ function Evaluate()
 		answer = "Invalid Base";
 	}
 
-	  document.myForm.answer.value = answer;
-
 	  return answer;
 }
 
-function Eval_Previous_Operation(prev_op, current_value)
+function ParseSideA(subEQ)
 {
-	var result = null;
+    return parseInt(subEQ.match(/^\d+/));
+}
 
-	//evaluate the current value with the previous operator
-	switch(prev_op)
-	{
-		case "+":
-			result = parseInt(memory) + current_value;
-			break;
-		case "-":
-			result = parseInt(memory) - current_value;
-			break;
-		case "*":
-			result = parseInt(memory) * current_value;
-			break;
-		case "/":
-		    result = parseInt(memory) / current_value;
-			break;
-		default:
-			result = "Previous Operator Invalid";
-	}
-
-	return result;
+function ParseSideB(subEQ)
+{
+    return parseInt(subEQ.match(/\d+$/));
 }
 
 function ValidInput(currentInput)
@@ -524,37 +514,72 @@ function ValidInput(currentInput)
 function ValidEquation(currentEquation)
 {
 
+  currentEquation = String(currentEquation);
+
   switch(base_mode)
   {
 		case "Decimal":
-			if(currentEquation.test(/^[0-9\(\)\+\-\*\/]+$/) != NULL) // Test to see if current equation only contains valid characters
+			if(currentEquation.match(/^[0-9\(\)\+\-\*\/]+$/)) // Test to see if current equation only contains valid characters
 			{
                 // Test to see if there are an equal amount of opening and closing parentheses
-                var openParenthesesCount = currentEquation.match(/\(/g).length != NULL ?  currentEquation.match(/\(/g).length : 0;
-                var closeParenthesesCount = currentEquation.match(/\)/g).length != NULL ? currentEquation.match(/\)/g).length : 0;
+                var openParenthesesCount;
+                var closeParenthesesCount;
+
+                if(currentEquation.match(/\(/g))
+                {
+                    openParenthesesCount = currentEquation.match(/\(/g).length;
+                }
+                else
+                {
+                    openParenthesesCount = 0;
+                }
+
+                if(currentEquation.match(/\(/g))
+                {
+                    closeParenthesesCount = currentEquation.match(/\)/g).length;
+                }
+                else
+                {
+                    closeParenthesesCount = 0;
+                }
 
                 if(openParenthesesCount == closeParenthesesCount)
 				{
-                    return true;
+                    if(currentEquation.match(/\([\+\-\*\/]/))
+                    {
+                        // Equation is invalid because there is an operator immedately following an open parenthesis
+                        errorFlag = ErrorType.InvalidEQOpAfterOpenParen;
+                        return false;
+                    }
+                    else
+                    {
+                        // Equation is valid
+                        return true;
+                    }
                 }
                 else
                 {
                     // Equation is invalid because the parentheses counts don't match.
+                    errorFlag = ErrorType.InvalidEQParenMismatch;
                     return false;
                 }
 			}
 			else
 			{
                 // Equation contains invalid characters
+                errorFlag = ErrorType.InvalidEQContainsInvalidChar;
 				return false;
 			}
 			break;
+
 		case "Binary":
 			// Check if the equation is valid by checking for any digit not 0 or 1
 			break;
+
 		case "Hexadecimal":
 			// Check if the equation is valid by checking for anything outside of 0-9 and A-F
 			break;
+
 		default:
 			return false;
 	}
