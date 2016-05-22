@@ -293,7 +293,8 @@ function Evaluate()
             // Does equation contain parentheses? If so evaluate all of those first
             while (equation.match(/[\(\)]/))
             {
-                var parenSetMatches = equation.match(/\([\d\+\-\*\/]+\)/g);  // will only match single parentheses sets (not multi tiered)
+                var operation = '';
+                var parenSetMatches = equation.match(/\([\d\+\-\*\/\.]+\)/g);  // will only match single parentheses sets (not multi tiered)
 
                 //debug
                 console.log("\nEntering Decimal Evaluate with parentheses. parenSetMatches = " + parenSetMatches);
@@ -307,28 +308,201 @@ function Evaluate()
 
                     origSubEQ = parenSetMatches[i]; // Store the original parentheses set to delete from equation later
 
-                    // match for any * and surrounding numbers, evaluate, and replace in sub equation
-                    while(parenSetMatches[i].match(/\d+\*\d+/)) //BCG replace conditional with function call to something like HasOperator(subEQ, op) that returns a bool.
+                    // match each set of * or / and surrounding numbers from left to right, evaluate, and replace in sub equation
+                    // BCG maybe try to replace the below loop with a function call that takes operators as parameter
+                    while(parenSetMatches[i].match(/\-?\d+\.?\d*[\*\/]\-?\d+\.?\d*/))
                     {
+                        //BCG - Replace following with a function call to something like EvaluateSubEQ(subEQ, op) that returns the subEQAnswer?
+                        operation = String(parenSetMatches[i].match(/\-?\d+\.?\d*[\*\/]\-?\d+\.?\d*/));
+                        if (operation.match(/\-?\d+\.?\d*\*\-?\d+\.?\d*/))
+                        {
+                            // Operator is *
+                            //debug
+                            console.log("Multiplication found");
+                            //endOfDebug
+                            subEquation = String(operation.match(/\-?\d+\.?\d*\*\-?\d+\.?\d*/));
+                            //debug
+                            console.log("SubEquation = " + subEquation);
+                            //endOfDebug
+
+                            // BCG before parsing we want to verify that if there is a negative that it's a true negative (this will have to be different for a subtraction operation)
+                            // If subEquation.match(/^\-/); (if there is a "-" at the beginning of the operation. If there's one on Side B we know it's a real negative)
+                            //      TRUE: then lets go on to Verify it's a true negative
+                            //      FALSE: then there is no negative. let's go ahead and parse for each sideA
+                            // Verify true negative -> If parenSetMatches[i].match(/.\-?\d+\.?\d*\*\-?\d+\.?\d*/);  **Find some how to do one character just before the original match that forms operation string**
+
+                            // parse subEquation for sideA, and sideB
+                            if (subEquation.match(/^\-/))
+                            {
+                                if(SideATrueNegative(parenSetMatches[i], subEquation))
+                                {
+                                    // Side A is a true negative number, so continue on.
+                                    //debug
+                                    console.log("Testing for Side A negativity. Side A is a true negative number.");
+                                    //endOfDebug
+                                }
+                                else
+                                {
+                                    // Not a true negative number, is a subtraction operator so remove it from the subEquation.
+                                    subEquation = subEquation.replace(/^./, '');
+                                    //debug
+                                    console.log("Testing for Side A negativity. Side A is not a negative number. modifying subEquation.");
+                                    console.log("subEquation now = " + subEquation);
+                                    //endOfDebug
+                                }
+                            }
+
+                            sideA = parseFloat(subEquation.match(/^\-?\d+\.?\d*/));
+                            sideB = parseFloat(subEquation.match(/\-?\d+\.?\d*$/));
+                            //debug
+                            console.log("sideA parsed = " + sideA);
+                            console.log("sideB parsed = " + sideB);
+                            //endOfDebug
+                            subEQAnswer = sideA * sideB;
+                            //debug
+                            console.log("subEQAnswer =  " + subEQAnswer);
+                            //endOfDebug
+                        }
+                        else
+                        {
+                            // Operator is /
+                            //debug
+                            console.log("Division found");
+                            //endOfDebug
+                            subEquation = String(operation.match(/\-?\d+\.?\d*\/\-?\d+\.?\d*/));
+                            //debug
+                            console.log("SubEquation = " + subEquation);
+                            //endOfDebug
+                            if (subEquation.match(/^\-/))
+                            {
+                                if(SideATrueNegative(parenSetMatches[i], subEquation))
+                                {
+                                    // Side A is a true negative number, so continue on.
+                                    //debug
+                                    console.log("Testing for Side A negativity. Side A is a true negative number.");
+                                    //endOfDebug
+                                }
+                                else
+                                {
+                                    // Not a true negative number, is a subtraction operator so remove it from the subEquation.
+                                    subEquation = subEquation.replace(/^./, '');
+                                    //debug
+                                    console.log("Testing for Side A negativity. Side A is not a negative number. modifying subEquation.");
+                                    console.log("subEquation now = " + subEquation);
+                                    //endOfDebug
+                                }
+                            }
+                            sideA = parseFloat(subEquation.match(/^\-?\d+\.?\d*/));
+                            sideB = parseFloat(subEquation.match(/\-?\d+\.?\d*$/));
+                            //debug
+                            console.log("sideA parsed = " + sideA);
+                            console.log("sideB parsed = " + sideB);
+                            //endOfDebug
+                            subEQAnswer = sideA / sideB;
+                            //debug
+                            console.log("subEQAnswer =  " + subEQAnswer);
+                            //endOfDebug
+                        }
+
+                        // Replace subEquation with with subEQAnswer in string and get rid of parentheses
+
+                        // It found division again after solving. it set modified parenSetMatch to 3 but then found division again... why?
+
+                        parenSetMatches[i] = parenSetMatches[i].replace(subEquation, String(subEQAnswer));
+                        parenSetMatches[i] = parenSetMatches[i].replace(/\(/, '');
+                        parenSetMatches[i] = parenSetMatches[i].replace(/\)/, '');
                         //debug
-                        console.log("Multiplication found");
+                        console.log("modified parenSetMatch =  " + parenSetMatches[i]);
                         //endOfDebug
-                        //BCG - Replace following 4 lines with a function call to something like EvaluateSubEQ(subEQ, op) that returns the subEQAnswer?
-                        subEquation = String(parenSetMatches[i].match(/\d+\*\d+/));
-                        //debug
-                        console.log("SubEquation = " + subEquation);
-                        //endOfDebug
-                        // parse subEquation for sideA, and sideB
-                        sideA = parseInt(subEquation.match(/^\d+/));
-                        sideB = parseInt(subEquation.match(/\d+$/));
-                        //debug
-                        console.log("sideA parsed = " + sideA);
-                        console.log("sideB parsed = " + sideB);
-                        //endOfDebug
-                        subEQAnswer = sideA * sideB;
-                        //debug
-                        console.log("subEQAnswer =  " + subEQAnswer);
-                        //endOfDebug
+                    }
+                    // match each set of + or - and surrounding numbers from left to right, evaluate, and replace in sub equation
+                    while(parenSetMatches[i].match(/\-?\d+\.?\d*[\+\-]\-?\d+\.?\d*/))
+                    {
+                        operation = String(parenSetMatches[i].match(/\-?\d+\.?\d*[\+\-]\-?\d+\.?\d*/));
+
+                        if (operation.match(/\-?\d+\.?\d*\+\-?\d+\.?\d*/))
+                        {
+                            // Operator is +
+                            //debug
+                            console.log("Addition found");
+                            //endOfDebug
+                            subEquation = String(operation.match(/\-?\d+\.?\d*\+\-?\d+\.?\d*/));
+                            //debug
+                            console.log("SubEquation = " + subEquation);
+                            //endOfDebug
+                            // parse subEquation for sideA, and sideB
+                            if (subEquation.match(/^\-/))
+                            {
+                                if(SideATrueNegative(parenSetMatches[i], subEquation))
+                                {
+                                    // Side A is a true negative number, so continue on.
+                                    //debug
+                                    console.log("Testing for Side A negativity. Side A is a true negative number.");
+                                    //endOfDebug
+                                }
+                                else
+                                {
+                                    // Not a true negative number, is a subtraction operator so remove it from the subEquation.
+                                    subEquation = subEquation.replace(/^./, '');
+                                    //debug
+                                    console.log("Testing for Side A negativity. Side A is not a negative number. modifying subEquation.");
+                                    console.log("subEquation now = " + subEquation);
+                                    //endOfDebug
+                                }
+                            }
+                            sideA = parseFloat(subEquation.match(/^\-?\d+\.?\d*/));
+                            sideB = parseFloat(subEquation.match(/\-?\d+\.?\d*$/));
+                            //debug
+                            console.log("sideA parsed = " + sideA);
+                            console.log("sideB parsed = " + sideB);
+                            //endOfDebug
+                            subEQAnswer = sideA + sideB;
+                            //debug
+                            console.log("subEQAnswer =  " + subEQAnswer);
+                            //endOfDebug
+                        }
+                        else
+                        {
+                            // Operator is -
+                            //debug
+                            console.log("Subtraction found");
+                            //endOfDebug
+                            subEquation = String(operation.match(/\-?\d+\.?\d*\-\-?\d+\.?\d*/));
+                            //debug
+                            console.log("SubEquation = " + subEquation);
+                            //endOfDebug
+                            // parse subEquation for sideA, and sideB
+                            if (subEquation.match(/^\-/))
+                            {
+                                if(SideATrueNegative(parenSetMatches[i], subEquation))
+                                {
+                                    // Side A is a true negative number, so continue on.
+                                    //debug
+                                    console.log("Testing for Side A negativity. Side A is a true negative number.");
+                                    //endOfDebug
+                                }
+                                else
+                                {
+                                    // Not a true negative number, is a subtraction operator so remove it from the subEquation.
+                                    subEquation = subEquation.replace(/^./, '');
+                                    //debug
+                                    console.log("Testing for Side A negativity. Side A is not a negative number. modifying subEquation.");
+                                    console.log("subEquation now = " + subEquation);
+                                    //endOfDebug
+                                }
+                            }
+                            sideA = parseFloat(subEquation.match(/^\-?\d+\.?\d*/));
+                            //sideB = parseFloat(subEquation.match(/\-?\d+\.?\d*$/));
+                            sideB = ParseSideB(subEquation);
+                            //debug
+                            console.log("sideA parsed = " + sideA);
+                            console.log("sideB parsed = " + sideB);
+                            //endOfDebug
+                            subEQAnswer = sideA - sideB;
+                            //debug
+                            console.log("subEQAnswer =  " + subEQAnswer);
+                            //endOfDebug
+                        }
 
                         // Replace subEquation with with subEQAnswer in string and get rid of parentheses
                         parenSetMatches[i] = parenSetMatches[i].replace(subEquation, String(subEQAnswer));
@@ -337,42 +511,6 @@ function Evaluate()
                         //debug
                         console.log("modified parenSetMatch =  " + parenSetMatches[i]);
                         //endOfDebug
-                    }
-                    // match for any / and surrounding numbers, evaluate, and replace in sub equation
-                    while(parenSetMatches[i].match(/\d+\/\d+/))
-                    {
-                        subEquation = String(parenSetMatches[i].match(/\d+\/\d+/));
-                        // parse subEquation for sideA, and sideB
-                        sideA = parseInt(subEquation.match(/^\d+/));
-                        sideB = parseInt(subEquation.match(/\d+$/));
-                        subEQAnswer = sideA / sideB;
-
-                        // Replace subEquation with with subEQAnswer in string
-                        parenSetMatches[i] = parenSetMatches[i].replace(subEquation, String(subEQAnswer));
-                    }
-                    // match for any + and surrounding numbers, evaluate, and replace in sub equation
-                    while(parenSetMatches[i].match(/\d+\+\d+/))
-                    {
-                        subEquation = String(parenSetMatches[i].match(/\d+\+\d+/));
-                        // parse subEquation for sideA, and sideB
-                        sideA = parseInt(subEquation.match(/^\d+/));
-                        sideB = parseInt(subEquation.match(/\d+$/));
-                        subEQAnswer = sideA + sideB;
-
-                        // Replace subEquation with with subEQAnswer in string
-                        parenSetMatches[i] = parenSetMatches[i].replace(subEquation, String(subEQAnswer));
-                    }
-                    // match for any - and surrounding numbers, evaluate, and replace in sub equation
-                    while(parenSetMatches[i].match(/\d+\-\d+/))
-                    {
-                        subEquation = String(parenSetMatches[i].match(/\d+\-\d+/));
-                        // parse subEquation for sideA, and sideB
-                        sideA = parseInt(subEquation.match(/^\d+/));
-                        sideB = parseInt(subEquation.match(/\d+$/));
-                        subEQAnswer = sideA - sideB;
-
-                        // Replace subEquation with with subEQAnswer in string
-                        parenSetMatches[i] = parenSetMatches[i].replace(subEquation, String(subEQAnswer));
                     }
 
                     // Remove the parentheses from the solution
@@ -384,56 +522,131 @@ function Evaluate()
                     //debug
                     console.log("modified equation =  " + equation);
                     //endOfDebug
-
                 }
             }
 
             // Now evaluate the equation without parentheses
             answer = equation;
             // match for any * and surrounding numbers, evaluate, and replace in sub equation
-            while(answer.match(/\d+\*\d+/)) //BCG replace conditional with function call to something like HasOperator(subEQ, op) that returns a bool.
+            while(answer.match(/\-?\d+\.?\d*\*\-?\d+\.?\d*/)) //BCG replace conditional with function call to something like HasOperator(subEQ, op) that returns a bool.
             {
                 //BCG - Replace following 4 lines with a function call to something like EvaluateSubEQ(subEQ, op) that returns the subEQAnswer?
-                subEquation = answer.match(/\d+\*\d+/);
+                subEquation = String(answer.match(/\-?\d+\.?\d*\*\-?\d+\.?\d*/));
                 // parse subEquation for sideA, and sideB
-                sideA = parseInt(answer.match(/^\d+/));
-                sideB = parseInt(answer.match(/\d+$/));
+                if (subEquation.match(/^\-/))
+                {
+                    if(SideATrueNegative(answer, subEquation))
+                    {
+                        // Side A is a true negative number, so continue on.
+                        //debug
+                        console.log("Testing for Side A negativity. Side A is a true negative number.");
+                        //endOfDebug
+                    }
+                    else
+                    {
+                        // Not a true negative number, is a subtraction operator so remove it from the subEquation.
+                        subEquation = subEquation.replace(/^./, '');
+                        //debug
+                        console.log("Testing for Side A negativity. Side A is not a negative number. modifying subEquation.");
+                        console.log("subEquation now = " + subEquation);
+                        //endOfDebug
+                    }
+                }
+                sideA = parseFloat(answer.match(/^\-?\d+\.?\d*/));
+                sideB = parseFloat(answer.match(/\-?\d+\.?\d*$/));
                 subEQAnswer = sideA * sideB;
 
                 // Replace subEquation with with subEQAnswer in string
                 answer = answer.replace(subEquation, String(subEQAnswer));
             }
             // match for any / and surrounding numbers, evaluate, and replace in sub equation
-            while(answer.match(/\d+\/\d+/))
+            while(answer.match(/\-?\d+\.?\d*\/\-?\d+\.?\d*/))
             {
-                subEquation = answer.match(/\d+\/\d+/);
+                subEquation = String(answer.match(/\-?\d+\.?\d*\/\-?\d+\.?\d*/));
                 // parse subEquation for sideA, and sideB
-                sideA = parseInt(answer.match(/^\d+/));
-                sideB = parseInt(answer.match(/\d+$/));
+                if (subEquation.match(/^\-/))
+                {
+                    if(SideATrueNegative(answer, subEquation))
+                    {
+                        // Side A is a true negative number, so continue on.
+                        //debug
+                        console.log("Testing for Side A negativity. Side A is a true negative number.");
+                        //endOfDebug
+                    }
+                    else
+                    {
+                        // Not a true negative number, is a subtraction operator so remove it from the subEquation.
+                        subEquation = subEquation.replace(/^./, '');
+                        //debug
+                        console.log("Testing for Side A negativity. Side A is not a negative number. modifying subEquation.");
+                        console.log("subEquation now = " + subEquation);
+                        //endOfDebug
+                    }
+                }
+                sideA = parseFloat(answer.match(/^\-?\d+\.?\d*/));
+                sideB = parseFloat(answer.match(/\-?\d+\.?\d*$/));
                 subEQAnswer = sideA / sideB;
 
                 // Replace subEquation with with subEQAnswer in string
                 answer = answer.replace(subEquation, String(subEQAnswer));
             }
             // match for any + and surrounding numbers, evaluate, and replace in sub equation
-            while(answer.match(/\d+\+\d+/))
+            while(answer.match(/\-?\d+\.?\d*\+\-?\d+\.?\d*/))
             {
-                subEquation = answer.match(/\d+\+\d+/);
+                subEquation = String(answer.match(/\-?\d+\.?\d*\+\-?\d+\.?\d*/));
                 // parse subEquation for sideA, and sideB
-                sideA = parseInt(answer.match(/^\d+/));
-                sideB = parseInt(answer.match(/\d+$/));
+                if (subEquation.match(/^\-/))
+                {
+                    if(SideATrueNegative(answer, subEquation))
+                    {
+                        // Side A is a true negative number, so continue on.
+                        //debug
+                        console.log("Testing for Side A negativity. Side A is a true negative number.");
+                        //endOfDebug
+                    }
+                    else
+                    {
+                        // Not a true negative number, is a subtraction operator so remove it from the subEquation.
+                        subEquation = subEquation.replace(/^./, '');
+                        //debug
+                        console.log("Testing for Side A negativity. Side A is not a negative number. modifying subEquation.");
+                        console.log("subEquation now = " + subEquation);
+                        //endOfDebug
+                    }
+                }
+                sideA = parseFloat(answer.match(/^\-?\d+\.?\d*/));
+                sideB = parseFloat(answer.match(/\-?\d+\.?\d*$/));
                 subEQAnswer = sideA + sideB;
 
                 // Replace subEquation with with subEQAnswer in string
                 answer = answer.replace(subEquation, String(subEQAnswer));
             }
             // match for any - and surrounding numbers, evaluate, and replace in sub equation
-            while(answer.match(/\d+\-\d+/))
+            while(answer.match(/\-?\d+\.?\d*\-\-?\d+\.?\d*/))
             {
-                subEquation = answer.match(/\d+\-\d+/);
+                subEquation = String(answer.match(/\-?\d+\.?\d*\-\-?\d+\.?\d*/));
                 // parse subEquation for sideA, and sideB
-                sideA = parseInt(answer.match(/^\d+/));
-                sideB = parseInt(answer.match(/\d+$/));
+                if (subEquation.match(/^\-/))
+                {
+                    if(SideATrueNegative(answer, subEquation))
+                    {
+                        // Side A is a true negative number, so continue on.
+                        //debug
+                        console.log("Testing for Side A negativity. Side A is a true negative number.");
+                        //endOfDebug
+                    }
+                    else
+                    {
+                        // Not a true negative number, is a subtraction operator so remove it from the subEquation.
+                        subEquation = subEquation.replace(/^./, '');
+                        //debug
+                        console.log("Testing for Side A negativity. Side A is not a negative number. modifying subEquation.");
+                        console.log("subEquation now = " + subEquation);
+                        //endOfDebug
+                    }
+                }
+                sideA = parseFloat(answer.match(/^\-?\d+\.?\d*/));
+                sideB = parseFloat(answer.match(/\-?\d+\.?\d*$/));
                 subEQAnswer = sideA - sideB;
 
                 // Replace subEquation with with subEQAnswer in string
@@ -475,14 +688,96 @@ function Evaluate()
 	  return answer;
 }
 
-function ParseSideA(subEQ)
+function SideATrueNegative(fullExpressionOfSubEQ, subEQ)
 {
-    return parseInt(subEQ.match(/^\d+/));
+    var tempStr = ''
+    var subEQRegExp = ConvertToRegExp(subEQ);
+    var regex = new RegExp('.' + subEQRegExp);
+
+    tempStr = String(fullExpressionOfSubEQ.match(regex));
+
+    if (tempStr.match(/^[^\d]/)) // If the character immediately before the subEQ is not a number
+    {
+        // Then sideA is truly a negative number
+        return true;
+    }
+
+    // Otherwise, it's actually a subtraction operation incorrectly captured in the regex
+    return false;
+}
+
+function ParseSideA(subEQ) // BCG maybe embed true negative validation into this function
+{
+    return parseFloat(subEQ.match(/^\-?\d+\.?\d*/));
 }
 
 function ParseSideB(subEQ)
 {
-    return parseInt(subEQ.match(/\d+$/));
+    var bSide = String(subEQ.match(/\-?\d+\.?\d*$/));
+    var tempStr = '';
+
+    //debug
+    console.log("Entering ParseSideB. bSide = " + bSide);
+    //endOfDebug
+
+    if (bSide.match(/\-/)) // BCG side B is not DETECTING THAT IT'S NEGATIVE!!!
+    {
+        // Then validate that it's a true negative
+        //debug
+        console.log("B side negative detected. Validating if true.");
+        //endOfDebug
+        var bSideRegExp = ConvertToRegExp(bSide);
+        var tempRegexp = new RegExp('.' + bSideRegExp);
+
+        tempStr = String(subEQ.match(tempRegexp));
+
+        //debug
+        console.log("tempStr = " + tempStr);
+        //endOfDebug
+
+        if (tempStr.match(/^[^\d]/)) // If the character immediately before sideB is not a number
+        {
+            // Then sideB is truly a negative number
+            //debug
+            console.log("Side B truly negative");
+            //endOfDebug
+        }
+        else
+        {
+            // SideB is not a negative number. Remove the "-" from the beginning of the side
+            bSide = bSide.replace(/^./, '');
+        }
+    }
+
+    return bSide;
+}
+
+function ConvertToRegExp(myString)
+{
+    var strTemp = String(myString)
+    //console.log("strTemp = " + strTemp);
+
+    if (strTemp.match(/\*/))
+    {
+        //console.log("Multiplication found");
+        strTemp = strTemp.replace(/\*/, "\\*");
+        //console.log("New strTemp = " + strTemp);
+    }
+    if (strTemp.match(/\//))
+    {
+        strTemp = strTemp.replace(/\//, "\\/");
+    }
+    if(strTemp.match(/\+/))
+    {
+        strTemp = strTemp.replace(/\+/, "\\+");
+    }
+    if (strTemp.match(/\-/))
+    {
+        //console.log("Subtraction or Negative found");
+        strTemp = strTemp.replace(/\-/, "\\-");
+    }
+
+    return strTemp;
 }
 
 function ValidInput(currentInput)
