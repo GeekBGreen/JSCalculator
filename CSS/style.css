@@ -55,12 +55,18 @@ input[type="text"] {
 
 #openParenButton
 {
-	width: 4.3em;
+	width: 3.1em;
 }
 
 #closeParenButton
 {
-	width: 4.3em;
+	width: 3.1em;
+}
+
+#decimalPoint
+{
+	height: 2em;
+	width: 2em;
 }
 
 #copyright {
