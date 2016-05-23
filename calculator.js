@@ -661,7 +661,7 @@ function ValidEquation(currentEquation)
                     openParenthesesCount = 0;
                 }
 
-                if(currentEquation.match(/\(/g))
+                if(currentEquation.match(/\)/g))
                 {
                     closeParenthesesCount = currentEquation.match(/\)/g).length;
                 }
