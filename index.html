@@ -17,38 +17,39 @@
 	  <h4>A Simple Javascript Calculator</h4>
 
 	  <br>
-	  
+
 	  <form name="myForm">
 		<div class="grid_2">
-			<input type="button" name="1" value="1" OnClick="DisplayInput('1')" class="numOrOpButton">
-			<input type="button" name="2" value="2" OnClick="DisplayInput('2')" class="numOrOpButton">
-			<input type="button" name="3" value="3" OnClick="DisplayInput('3')" class="numOrOpButton">
-			<input type="button" name="add" value="+" OnClick="DisplayInput('+')" class="numOrOpButton">
-			<input type="button" name="4" value="4" OnClick="DisplayInput('4')" class="numOrOpButton">
-			<input type="button" name="5" value="5" OnClick="DisplayInput('5')" class="numOrOpButton">
-			<input type="button" name="6" value="6" OnClick="DisplayInput('6')" class="numOrOpButton">
-			<input type="button" name="sub" value="-" OnClick="DisplayInput('-')" class="numOrOpButton">
-			<input type="button" name="7" value="7" OnClick="DisplayInput('7')" class="numOrOpButton">
-			<input type="button" name="8" value="8" OnClick="DisplayInput('8')" class="numOrOpButton">
-			<input type="button" name="9" value="9" OnClick="DisplayInput('9')" class="numOrOpButton">
-			<input type="button" name="mul" value="*" OnClick="DisplayInput('*')" class="numOrOpButton">
-			<input type="button" name="0" value="0" OnClick="DisplayInput('0')" class="numOrOpButton" id="zeroButton">
-			<input type="button" name="div" value="/" OnClick="DisplayInput('/')" class="numOrOpButton">
-			<input type="button" name="=" value="=" OnClick="DisplayInput('=')" class="numOrOpButton" id="equalsButton">
-			<input type="button" name="clear" value="CLEAR" onClick="ClearEQ()" class="numOrOpButton" id="clearButton">
+			<input type="button" name="1" value="1" OnClick="UpdateStateMachine('1')" class="numOrOpButton">
+			<input type="button" name="2" value="2" OnClick="UpdateStateMachine('2')" class="numOrOpButton">
+			<input type="button" name="3" value="3" OnClick="UpdateStateMachine('3')" class="numOrOpButton">
+			<input type="button" name="add" value="+" OnClick="UpdateStateMachine('+')" class="numOrOpButton">
+			<input type="button" name="4" value="4" OnClick="UpdateStateMachine('4')" class="numOrOpButton">
+			<input type="button" name="5" value="5" OnClick="UpdateStateMachine('5')" class="numOrOpButton">
+			<input type="button" name="6" value="6" OnClick="UpdateStateMachine('6')" class="numOrOpButton">
+			<input type="button" name="sub" value="-" OnClick="UpdateStateMachine('-')" class="numOrOpButton">
+			<input type="button" name="7" value="7" OnClick="UpdateStateMachine('7')" class="numOrOpButton">
+			<input type="button" name="8" value="8" OnClick="UpdateStateMachine('8')" class="numOrOpButton">
+			<input type="button" name="9" value="9" OnClick="UpdateStateMachine('9')" class="numOrOpButton">
+			<input type="button" name="mul" value="*" OnClick="UpdateStateMachine('*')" class="numOrOpButton">
+			<input type="button" name="0" value="0" OnClick="UpdateStateMachine('0')" class="numOrOpButton" id="zeroButton">
+			<input type="button" name="div" value="/" OnClick="UpdateStateMachine('/')" class="numOrOpButton">
+            <input type="button" name="open" value="(" OnClick="UpdateStateMachine('(')" class="numOrOpButton" id="openParenButton">
+            <input type="button" name="close" value=")" OnClick="UpdateStateMachine(')')" class="numOrOpButton" id="closeParenButton">
+            <input type="button" name="point" value="." onclick="UpdateStateMachine('.')" clas="numOrOpButton" id="decimalPoint">
+			<input type="button" name="=" value="=" OnClick="UpdateStateMachine('=')" class="numOrOpButton" id="equalsButton">
+			<input type="button" name="clear" value="CLEAR" onClick="UpdateStateMachine('CLR')" class="numOrOpButton" id="clearButton">
 		</div>
-		
+
 		<div class="grid_1">
-			<p class="label">Input</p> 
 			<p class="label">Equation</p>
-			<p class="label">Answer</p> 
+			<p class="label">Answer</p>
 		</div>
 		<div class="grid_3">
-			<input type="text" name="user_input" id="user_input" disabled="disabled" value="Your input appears here"> <br>
 			<input type="text" name="equation" id="equation" disabled="disabled" value="Your equation here" onClick="ChangeFocus("user_input")"> <br>
 			<input type="text" name="answer" disabled="disabled" value="Answer appears here">
 		</div>
-	
+
 		<select id="base_selector" name="base_selector" value="Base Type" onchange="ChangeBaseMode()">
 		  <option>Decimal</option>
 		  <option>Binary</option>
@@ -56,35 +57,34 @@
 		</select>
 
 	  </form>
-	  
+
 	  <div class="grid_6 omega">
 			<h3>Description</h3>
 			<p>
-				This is a simple one page site containing a calculator application written in javascript. I'm new to 
+				This is a simple one page site containing a calculator application written in javascript. I'm new to
 				web development, so I thought that creating a calculator application would be a decent first start
-				to becoming familiar with the entire process of creating a web app. I'll be using this site to experiment 
+				to becoming familiar with the entire process of creating a web app. I'll be using this site to experiment
 				with web development and  design.
 			</p>
 			<p>
-				I hope this calculator is pretty self explanatory to use. At this point it only does basic operations on
-				decimal numbers. In the future I plan to add hexadecimal and binary operations/conversions to it as well.
-				In the end, it probably won't end up doing anything that the standard windows calculator can't do, but
-				at least it does something useful.
+				I hope this calculator is pretty self explanatory to use. At this only does operations on decimal numbers.
+                In the future I plan to add hexadecimal and binary operations/conversions to it as well. In the end, it
+                probably won't end up doing anything that the standard windows calculator can't do, but at least it does
+                something useful!
 			</p>
 	  </div>
-	  
+
 	  <div class="grid_6">
 			<h3>Future Features</h3>
 			<p>
 				<ul>
 					<li>Binary math and conversion</li>
 					<li>Hexadecimal math and conversion</li>
-					<li>A mobile version of the web page</li>
-					<li>Ability to type in the input box as if you were using a calculator</li>
+					<li>A responsive, mobile friendly version of the page</li>
 				</ul>
 			</p>
 	  </div>
-	  
+
 	  <div class="grid_6 omega">
 			<h3>Contact Me</h3>
 			<p>
@@ -92,9 +92,9 @@
 				at info@JSCalculator.com.
 			</p>
 	  </div>
-	  
+
 	  <div id="copyright" class="grid_12">
-			<p>&copy; 2014 JSCalculator.com. All Rights Reserved</p>
+			<p>&copy; 2016 JSCalculator.com. All Rights Reserved</p>
 	  </div>
    </div>
  </body>
